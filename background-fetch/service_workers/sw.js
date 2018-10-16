@@ -2,9 +2,11 @@
 importScripts('sw-helpers.js');
 
 async function getFetchResult(record) {
-  response = await record.responseReady;
-  if (!response)
-    return Promise.resolve(null);
+  try {
+    response = await record.responseReady;
+  } catch (e) {
+    return null;
+  }
 
   return {
     url: response.url,
