@@ -2,14 +2,14 @@
 <meta charset=utf-8>
 <meta name="timeout" content="long">
 <title>Web Locks API: bfcache</title>
-<link rel=help href="https://wicg.github.io/web-locks/">
+<link rel=help href="https://w3c.github.io/web-locks/">
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <script src="/common/utils.js"></script>
 <script src="/common/dispatcher/dispatcher.js"></script>
 <script src="/html/browsers/browsing-the-web/back-forward-cache/resources/helper.sub.js"></script>
-<script type="module">
-  import { runWebLocksBfcacheTest } from "./helpers.js";
+<script src="helpers.js"></script>
+<script>
 
   runWebLocksBfcacheTest({
     funcBeforeNavigation: async () => {

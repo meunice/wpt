@@ -1,3 +1,5 @@
+# mypy: allow-untyped-defs
+
 import json
 
 from urllib.parse import urlunsplit
@@ -25,7 +27,7 @@ class TestsApiHandler(ApiHandler):
         web_root,
         test_loader
     ):
-        super(TestsApiHandler, self).__init__(web_root)
+        super().__init__(web_root)
         self._tests_manager = tests_manager
         self._sessions_manager = sessions_manager
         self._wpt_port = wpt_port
@@ -109,7 +111,8 @@ class TestsApiHandler(ApiHandler):
             test_timeout = self._tests_manager.get_test_timeout(
                 test=test, session=session)
 
-            test = self._sessions_manager.get_test_path_with_query(test, session)
+            test = self._sessions_manager.get_test_path_with_query(
+                test, session)
             url = self._generate_test_url(
                 test=test,
                 token=token,
@@ -263,13 +266,7 @@ class TestsApiHandler(ApiHandler):
             test = split[0]
             test_query = split[1]
 
-        query = "token={}&timeout={}&https_port={}&web_root={}&{}".format(
-                token,
-                test_timeout,
-                self._wpt_ssl_port,
-                self._web_root,
-                test_query
-        )
+        query = f"token={token}&timeout={test_timeout}&https_port={self._wpt_ssl_port}&web_root={self._web_root}&{test_query}"
 
         return self._generate_url(
             protocol=protocol,
@@ -293,4 +290,4 @@ class TestsApiHandler(ApiHandler):
             query = ""
         if protocol is None:
             protocol = "http"
-        return urlunsplit([protocol, "{}:{}".format(hostname, port), uri, query, ''])
+        return urlunsplit([protocol, f"{hostname}:{port}", uri, query, ''])

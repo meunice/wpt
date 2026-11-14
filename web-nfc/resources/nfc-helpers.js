@@ -47,11 +47,10 @@ function nfc_test(func, name, properties) {
 }
 
 const test_text_data = 'Test text data.';
-const test_text_byte_array = new TextEncoder('utf-8').encode(test_text_data);
+const test_text_byte_array = new TextEncoder().encode(test_text_data);
 const test_number_data = 42;
 const test_json_data = {level: 1, score: 100, label: 'Game'};
 const test_url_data = 'https://w3c.github.io/web-nfc/';
-const test_message_origin = 'https://127.0.0.1:8443';
 const test_buffer_data = new ArrayBuffer(test_text_byte_array.length);
 const test_buffer_view = new Uint8Array(test_buffer_data);
 test_buffer_view.set(test_text_byte_array);
@@ -124,7 +123,7 @@ function createTextRecord(data, encoding, lang) {
 
 function createMimeRecordFromJson(json) {
   return createRecord(
-      'mime', new TextEncoder('utf-8').encode(JSON.stringify(json)),
+      'mime', new TextEncoder().encode(JSON.stringify(json)),
       test_record_id, 'application/json');
 }
 

@@ -85,6 +85,20 @@ test(() => {
   assert_false(controls[4].i.willValidate, 'in disabled fieldset');
 }, 'willValidate after upgrade');
 
+test(t => {
+  const control = document.createElement('will-be-defined-2');
+
+  customElements.define('will-be-defined-2', class extends HTMLElement {
+    static get formAssociated() { return true; }
+  });
+
+  container.append(control);
+  t.add_cleanup(() => { container.innerHTML = ''; });
+
+  const i = control.attachInternals();
+  assert_true(i.willValidate);
+}, 'willValidate after upgrade (document.createElement)');
+
 test(() => {
   const element = new NotFormAssociatedElement();
   assert_throws_dom('NotSupportedError', () => element.i.willValidate);
@@ -175,6 +189,15 @@ test(() => {
 }, 'validity and setValidity()');
 
 test(() => {
+  const control = document.createElement('my-control');
+  control.i.setValidity({badInput: true}, 'error message');
+  const validity = control.i.validity;
+  assert_false(validity.customError);
+  assert_false(validity.valid);
+  assert_equals(control.i.validationMessage, 'error message');
+}, "validity.customError should be false if not explicitly set via setValidity()");
+
+test(() => {
   document.body.insertAdjacentHTML('afterbegin', '<my-control><light-child></my-control>');
   let control = document.body.firstChild;
   const flags = {valueMissing: true};
@@ -184,9 +207,12 @@ test(() => {
     control.i.setValidity(flags, m, document.body);
   }, 'Not a descendant');
 
-  assert_throws_dom('NotFoundError', () => {
-    control.i.setValidity(flags, m, control);
-  }, 'Self');
+  let notHTMLElement = document.createElementNS('some-random-namespace', 'foo');
+  control.appendChild(notHTMLElement);
+  assert_throws_js(TypeError, () => {
+    control.i.setValidity(flags, m, notHTMLElement);
+  }, 'Not a HTMLElement');
+  notHTMLElement.remove();
 
   // A descendant
   control.i.setValidity(flags, m, control.querySelector('light-child'));
@@ -204,6 +230,22 @@ test(() => {
   control.i.setValidity(flags, m, nestedShadowChild);
 }, '"anchor" argument of setValidity()');
 
+test(t => {
+  const control = document.createElement('my-control');
+  document.body.appendChild(control);
+  t.add_cleanup(() => control.remove());
+  const flags = {valueMissing: true};
+  const m = 'non-empty message';
+
+  // Self
+  control.i.setValidity(flags, m, control);
+}, '"anchor" argument of setValidity(): passing self');
+
+test(() => {
+  const element = new NotFormAssociatedElement();
+  assert_throws_dom('NotSupportedError', () => element.i.checkValidity());
+}, "checkValidity() should throw NotSupportedError if the target element is not a form-associated custom element");
+
 test(() => {
   const control = document.createElement('my-control');
   let invalidCount = 0;
@@ -220,6 +262,11 @@ test(() => {
   assert_false(control.i.checkValidity());
   assert_equals(invalidCount, 1);
 }, 'checkValidity()');
+
+test(() => {
+  const element = new NotFormAssociatedElement();
+  assert_throws_dom('NotSupportedError', () => element.i.reportValidity());
+}, "reportValidity() should throw NotSupportedError if the target element is not a form-associated custom element");
 
 test(() => {
   const control = document.createElement('my-control');

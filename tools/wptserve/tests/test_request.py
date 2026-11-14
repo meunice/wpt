@@ -28,7 +28,7 @@ class MockHTTPMessage(dict):
 
     def getallmatchingheaders(self, key):
         values = dict.__getitem__(self, key.lower())
-        return ["{}: {}\n".format(key, v) for v in values]
+        return [f"{key}: {v}\n" for v in values]
 
 
 def test_request_headers_get():
@@ -55,7 +55,7 @@ def test_request_headers_encoding():
 
 def test_request_url_from_server_address():
     request_handler = mock.Mock()
-    request_handler.server.scheme = 'http'
+    request_handler.scheme = 'http'
     request_handler.server.server_address = ('localhost', '8000')
     request_handler.path = '/demo'
     request_handler.headers = MockHTTPMessage()
@@ -67,7 +67,7 @@ def test_request_url_from_server_address():
 
 def test_request_url_from_host_header():
     request_handler = mock.Mock()
-    request_handler.server.scheme = 'http'
+    request_handler.scheme = 'http'
     request_handler.server.server_address = ('localhost', '8000')
     request_handler.path = '/demo'
     request_handler.headers = MockHTTPMessage({'host': ['web-platform.test:8001']})
